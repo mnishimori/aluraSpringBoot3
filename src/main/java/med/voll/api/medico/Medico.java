@@ -1,5 +1,6 @@
 package med.voll.api.medico;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.persistence.*;
 import lombok.*;
 import med.voll.api.endereco.Endereco;
@@ -28,4 +29,21 @@ public class Medico {
     @Embedded
     private Endereco endereco;
 
+    private Boolean ativo;
+
+    @PostConstruct
+    public void init(){
+        this.ativo = true;
+    }
+
+    public void atualizarInformacoes(DadosAtualizacaoMedico dadosAtualizacaoMedico) {
+        if (dadosAtualizacaoMedico.nome() != null) this.nome = dadosAtualizacaoMedico.nome();
+        if (dadosAtualizacaoMedico.telefone() != null) this.telefone = dadosAtualizacaoMedico.telefone();
+        if (dadosAtualizacaoMedico.dadosEndereco() != null)
+            this.endereco.atualizarInformacoes(dadosAtualizacaoMedico.dadosEndereco());
+    }
+
+    public void excluir(){
+        this.ativo = false;
+    }
 }

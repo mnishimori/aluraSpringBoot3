@@ -2,6 +2,7 @@ package med.voll.api.controller;
 
 import jakarta.validation.Valid;
 import med.voll.api.endereco.Endereco;
+import med.voll.api.medico.DadosAtualizacaoMedico;
 import med.voll.api.medico.DadosCadastroMedico;
 import med.voll.api.medico.DadosListagemCadastroMedico;
 import med.voll.api.medico.Medico;
@@ -34,9 +35,23 @@ public class MedicoController {
     @GetMapping
     public Page<DadosListagemCadastroMedico> listar(@PageableDefault(size = 10, page = 0, sort = {"nome"})
                                                                 Pageable pageable){
-        Page<Medico> medicos = medicoRepository.findAll(pageable);
+        Page<Medico> medicos = medicoRepository.findAllByAtivoTrue(pageable);
 
         return medicos.map(DadosListagemCadastroMedico::new);
+    }
+
+    @PutMapping
+    @Transactional
+    public void atualizar(@RequestBody @Valid DadosAtualizacaoMedico dadosAtualizacaoMedico){
+        Medico medico = medicoRepository.findById(dadosAtualizacaoMedico.id()).get();
+        medico.atualizarInformacoes(dadosAtualizacaoMedico);
+    }
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    public void deletar(@PathVariable Long id){
+        Medico medico = medicoRepository.getReferenceById(id);
+        medico.excluir();
     }
 
 
