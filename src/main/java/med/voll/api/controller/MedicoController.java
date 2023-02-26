@@ -35,8 +35,8 @@ public class MedicoController {
   @Transactional
   public ResponseEntity cadastrar(@RequestBody @Valid DadosCadastroMedico dados,
       UriComponentsBuilder uriComponentsBuilder) {
-    Endereco endereco = getEndereco(dados);
-    Medico medico = getMedico(dados, endereco);
+    var endereco = getEndereco(dados);
+    var medico = getMedico(dados, endereco);
 
     medicoRepository.save(medico);
 
@@ -48,14 +48,14 @@ public class MedicoController {
   public ResponseEntity<Page<DadosListagemCadastroMedico>> listar(
       @PageableDefault(size = 10, page = 0, sort = {"nome"})
       Pageable pageable) {
-    Page<Medico> medicos = medicoRepository.findAllByAtivoTrue(pageable);
+    var medicos = medicoRepository.findAllByAtivoTrue(pageable);
     var medicosCollection = medicos.map(DadosListagemCadastroMedico::new);
     return ResponseEntity.ok(medicosCollection);
   }
 
   @GetMapping("/{id}")
   public ResponseEntity getMedicoById(@PathVariable Long id) {
-    Medico medico = medicoRepository.getReferenceById(id);
+    var medico = medicoRepository.getReferenceById(id);
     return ResponseEntity.ok(new DadosDetalhamentoMedico(medico));
   }
 
@@ -63,7 +63,7 @@ public class MedicoController {
   @Transactional
   public ResponseEntity atualizar(
       @RequestBody @Valid DadosAtualizacaoMedico dadosAtualizacaoMedico) {
-    Medico medico = medicoRepository.findById(dadosAtualizacaoMedico.id()).get();
+    var medico = medicoRepository.findById(dadosAtualizacaoMedico.id()).get();
     medico.atualizarInformacoes(dadosAtualizacaoMedico);
     return ResponseEntity.ok(new DadosDetalhamentoMedico(medico));
   }
@@ -71,13 +71,13 @@ public class MedicoController {
   @DeleteMapping("/{id}")
   @Transactional
   public ResponseEntity deletar(@PathVariable Long id) {
-    Medico medico = medicoRepository.getReferenceById(id);
+    var medico = medicoRepository.getReferenceById(id);
     medico.excluir();
     return ResponseEntity.noContent().build();
   }
 
   private Endereco getEndereco(DadosCadastroMedico dados) {
-    Endereco endereco = Endereco.builder()
+    var endereco = Endereco.builder()
         .logradouro(dados.endereco().logradouro())
         .bairro(dados.endereco().bairro())
         .cep(dados.endereco().cep())
@@ -90,7 +90,7 @@ public class MedicoController {
   }
 
   private Medico getMedico(DadosCadastroMedico dados, Endereco endereco) {
-    Medico medico = Medico.builder()
+    var medico = Medico.builder()
         .nome(dados.nome())
         .email(dados.email())
         .telefone(dados.telefone())

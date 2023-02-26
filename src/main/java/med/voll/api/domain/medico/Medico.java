@@ -29,7 +29,7 @@ public class Medico {
     @Embedded
     private Endereco endereco;
 
-    private Boolean ativo;
+    private Boolean ativo = true;
 
     @PostConstruct
     public void init(){
