@@ -38,4 +38,6 @@ public class Consulta {
 
   private LocalDateTime data;
 
+  private String motivoCancelamento;
+
 }

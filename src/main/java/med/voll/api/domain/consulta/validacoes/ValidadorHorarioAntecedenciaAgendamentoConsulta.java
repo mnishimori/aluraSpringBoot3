@@ -4,8 +4,10 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import med.voll.api.domain.consulta.DadosAgendamentoConsulta;
 import med.voll.api.domain.exception.ValidacaoException;
+import org.springframework.stereotype.Component;
 
-public class ValidadorHorarioAntecedenciaAgendamentoConsulta {
+@Component
+public class ValidadorHorarioAntecedenciaAgendamentoConsulta implements ValidadorAgendamentoDeConsulta{
 
   public void validar(DadosAgendamentoConsulta dadosAgendamentoConsulta){
     var dataConsulta = dadosAgendamentoConsulta.data();

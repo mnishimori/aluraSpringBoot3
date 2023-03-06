@@ -1,5 +1,7 @@
 package med.voll.api.domain.consulta;
 
+import java.util.List;
+import med.voll.api.domain.consulta.validacoes.ValidadorAgendamentoDeConsulta;
 import med.voll.api.domain.exception.ValidacaoException;
 import med.voll.api.domain.medico.Medico;
 import med.voll.api.domain.medico.MedicoRepository;
@@ -17,13 +19,17 @@ public class AgendaDeConsultas {
   private MedicoRepository medicoRepository;
   @Autowired
   private PacienteRepository pacienteRepository;
+  @Autowired
+  private List<ValidadorAgendamentoDeConsulta> validadorAgendamentoDeConsultas;
 
   public void agendar(DadosAgendamentoConsulta dados) {
+    validadorAgendamentoDeConsultas.forEach(validador -> validador.validar(dados));
+
     Medico medico = escolherMedico(dados);
 
     var paciente = recuperarPaciente(dados);
 
-    var consulta = new Consulta(null, medico, paciente, dados.data());
+    var consulta = new Consulta(null, medico, paciente, dados.data(), "");
 
     consultaRepository.save(consulta);
   }
