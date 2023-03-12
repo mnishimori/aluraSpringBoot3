@@ -38,6 +38,9 @@ public class Consulta {
 
   private LocalDateTime data;
 
-  private String motivoCancelamento;
+  private MotivoCancelamento motivoCancelamento;
 
+  public void cancelar(MotivoCancelamento motivo) {
+    this.motivoCancelamento = motivo;
+  }
 }

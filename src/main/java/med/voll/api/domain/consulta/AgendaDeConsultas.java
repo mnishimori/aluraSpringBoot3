@@ -1,58 +1,58 @@
 package med.voll.api.domain.consulta;
 
 import java.util.List;
-import med.voll.api.domain.consulta.validacoes.ValidadorAgendamentoDeConsulta;
-import med.voll.api.domain.exception.ValidacaoException;
+import med.voll.api.domain.consulta.validacoes.agendamento.ValidadorAgendamentoDeConsulta;
 import med.voll.api.domain.medico.Medico;
-import med.voll.api.domain.medico.MedicoRepository;
+import med.voll.api.domain.medico.MedicoService;
 import med.voll.api.domain.paciente.Paciente;
-import med.voll.api.domain.paciente.PacienteRepository;
+import med.voll.api.domain.paciente.PacienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AgendaDeConsultas {
 
   @Autowired
-  private ConsultaRepository consultaRepository;
+  private ConsultaService consultaService;
   @Autowired
-  private MedicoRepository medicoRepository;
+  private MedicoService medicoService;
   @Autowired
-  private PacienteRepository pacienteRepository;
+  private PacienteService pacienteService;
   @Autowired
   private List<ValidadorAgendamentoDeConsulta> validadorAgendamentoDeConsultas;
 
-  public void agendar(DadosAgendamentoConsulta dados) {
-    validadorAgendamentoDeConsultas.forEach(validador -> validador.validar(dados));
+  @Transactional
+  public DadosDetalhamentoConsulta execute(DadosAgendamentoConsulta dados) {
+    validar(dados);
 
-    Medico medico = escolherMedico(dados);
-
+    var medico = escolherMedico(dados);
     var paciente = recuperarPaciente(dados);
+    var consulta = new Consulta(null, medico, paciente, dados.data(), null);
 
-    var consulta = new Consulta(null, medico, paciente, dados.data(), "");
+    consulta = consultaService.save(consulta);
+    return new DadosDetalhamentoConsulta(consulta);
+  }
 
-    consultaRepository.save(consulta);
+  private void validar(DadosAgendamentoConsulta dados) {
+    pacienteService.findByIdRequired(dados.idPaciente());
+    medicoService.findByIdRequired(dados.idMedico());
+    validadorAgendamentoDeConsultas.forEach(validador -> validador.validar(dados));
   }
 
   private Paciente recuperarPaciente(DadosAgendamentoConsulta dados) {
-    return pacienteRepository.findById(dados.idPaciente())
-        .orElseThrow(() -> new ValidacaoException("Id do paciente informado não existe!"));
+    return pacienteService.findByIdRequired(dados.idPaciente());
   }
 
   private Medico escolherMedico(DadosAgendamentoConsulta dados) {
     if (dados.idMedico() != null) {
-      return medicoRepository.findById(dados.idMedico())
-          .orElseThrow(() -> new ValidacaoException("Id do médico informado não existe!"));
+      return medicoService.findByIdRequired(dados.idMedico());
     } else {
       return definirMedicoAleatorio(dados);
     }
   }
 
   private Medico definirMedicoAleatorio(DadosAgendamentoConsulta dados) {
-    if (dados.especialidade() == null) {
-      throw new ValidacaoException("A especialidade é obrigatória quando o médico for opcional!");
-    }
-    return medicoRepository.escolherMedicoAleatorioLivreNaData(dados.especialidade(), dados.data());
+    return medicoService.escolherMedicoAleatorioLivreNaData(dados.especialidade(), dados.data());
   }
-
 }
