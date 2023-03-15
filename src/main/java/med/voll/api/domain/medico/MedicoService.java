@@ -1,7 +1,6 @@
 package med.voll.api.domain.medico;
 
 import java.time.LocalDateTime;
-import med.voll.api.domain.especialidade.Especialidade;
 import med.voll.api.domain.exception.ValidacaoException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
