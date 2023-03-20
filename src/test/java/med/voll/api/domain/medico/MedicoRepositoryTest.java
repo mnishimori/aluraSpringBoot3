@@ -41,11 +41,24 @@ class MedicoRepositoryTest {
     assertThat(medicoLivre).isEmpty();
   }
 
+  @Test
+  void deveriaDevolverMedicoQuandoEleEstiverDisponivelNaData() {
+    var proximaSegundaAs10 = LocalDate.now()
+        .with(TemporalAdjusters.next(DayOfWeek.MONDAY))
+        .atTime(10, 0);
+    var medico = cadastrarMedico("Medico", "medico@voll.med", "123456", Especialidade.CARDIOLOGIA);
+
+    var medicoLivre = medicoRepository.escolherMedicoAleatorioLivreNaData(Especialidade.CARDIOLOGIA,
+        proximaSegundaAs10).get();
+    assertThat(medicoLivre).isEqualTo(medico);
+  }
+
   private void cadastrarConsulta(Medico medico, Paciente paciente, LocalDateTime data) {
     em.persist(new Consulta(null, medico, paciente, data, null));
   }
 
-  private Medico cadastrarMedico(String nome, String email, String crm, Especialidade especialidade) {
+  private Medico cadastrarMedico(String nome, String email, String crm,
+      Especialidade especialidade) {
     var medico = new Medico(dadosMedico(nome, email, crm, especialidade));
     em.persist(medico);
     return medico;
@@ -57,7 +70,8 @@ class MedicoRepositoryTest {
     return paciente;
   }
 
-  private DadosCadastroMedico dadosMedico(String nome, String email, String crm, Especialidade especialidade) {
+  private DadosCadastroMedico dadosMedico(String nome, String email, String crm,
+      Especialidade especialidade) {
     return new DadosCadastroMedico(
         nome,
         email,
